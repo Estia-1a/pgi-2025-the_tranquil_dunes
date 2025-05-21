@@ -34,3 +34,29 @@ void first_pixel(char *source_path) {
     // Libération de la mémoire si nécessaire (selon l'implémentation de read_image_data)
     free(data);
 }
+
+/*void second_line(char *source_path) {
+    unsigned char *data;
+    int width, height, channels;
+
+    // Lecture de l'image
+    if (read_image_data(source_path, &data, &width, &height, &channels) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image.\n");
+        return;
+    }
+
+    // Vérifie que l'image a au moins 2 lignes
+    if (height < 2) {
+        fprintf(stderr, "L'image doit avoir au moins 2 lignes.\n");
+        return;
+    }
+
+    // Calcul de l'index du 1er pixel de la 2e ligne
+    int index = 3 * width;
+    int r = data[index];
+    int g = data[index + 1];
+    int b = data[index + 2];
+
+    // Affichage du résultat
+    printf("second_line: %d, %d, %d\n", r, g, b);
+}*/

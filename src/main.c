@@ -41,6 +41,11 @@ int main(int argc, char **argv) {
     /* first_pixel() function is defined in feature.h and implemented in feature.c */
     first_pixel(configuration.source_path);
   }
+
+  /* else if (strncmp(configuration.command, "second_line", 11) == 0) {
+    second_line(configuration.filenames[0]);
+  }*/
+
 }
 
   
