@@ -4,6 +4,7 @@
 #include "features.h"
 #include "utils.h"
 
+
 /**
  * @brief Here, you have to code features of the project.
  * Do not forget to commit regurlarly your changes.
@@ -14,15 +15,20 @@
 void helloWorld() {
     printf("Hello World !");
 }
+
 void dimension(char *source_path) {
     unsigned char *data;
-    int width, height, channels;
+    int width;
+    int height;
+    int channel_count;
 
-    read_image_data(source_path, &data, &width, &height, &channels); 
-    
-    
-    
-    printf("123");
-    printf("dimension: %d, %d\n", width, height);
-} 
+    int chiffreRetour = read_image_data(source_path, &data, &width, &height, &channel_count);
+    if (chiffreRetour == 0){
+        printf("il y a un problème avec read_image_data");
+    }
+    else {
+        printf("dimension: %d, %d", width, height);
+    }
+ 
+}
 

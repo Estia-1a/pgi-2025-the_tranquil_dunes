@@ -4,6 +4,7 @@ project(freud VERSION 1.0.1 DESCRIPTION "freud is an image analyst")
 # Set everything to use our image library
 set(ESTIA_IMAGE_PATH ${CMAKE_SOURCE_DIR}/estia-image)
 set(GETOPT_PATH ${CMAKE_SOURCE_DIR}/getopt)
+ 
 # Include directory
 include_directories( ${ESTIA_IMAGE_PATH}/include )
 include_directories( ${GETOPT_PATH}/include )

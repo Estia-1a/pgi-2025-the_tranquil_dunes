@@ -1,0 +1,3 @@
+-- Configuring done (0.2s)
+-- Generating done (0.1s)
+-- Build files have been written to: C:/Users/felix.domecq-cazaux/OneDrive - ESTIA/cour semestre 6/projet genie info/pgi-2025-the_tranquil_dunes/build
