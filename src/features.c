@@ -35,28 +35,30 @@ void first_pixel(char *source_path) {
     free(data);
 }
 
-/*void second_line(char *source_path) {
-    unsigned char *data;
+void second_line(char *source_path) {
+    unsigned char *data = NULL;
     int width, height, channels;
 
-    // Lecture de l'image
-    if (read_image_data(source_path, &data, &width, &height, &channels) == 0) {
-        fprintf(stderr, "Erreur lors de la lecture de l'image.\n");
+    if (read_image_data(source_path, &data, &width, &height, &channels) != 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image : %s\n", source_path);
         return;
     }
 
-    // Vérifie que l'image a au moins 2 lignes
-    if (height < 2) {
-        fprintf(stderr, "L'image doit avoir au moins 2 lignes.\n");
+    // Vérification minimale
+    if (height < 2 || channels < 3) {
+        fprintf(stderr, "Image invalide (hauteur < 2 ou < 3 canaux).\n");
+        free(data);
         return;
     }
 
-    // Calcul de l'index du 1er pixel de la 2e ligne
-    int index = 3 * width;
-    int r = data[index];
-    int g = data[index + 1];
-    int b = data[index + 2];
+    int x = 1;  // colonne
+    int y = 1;  // ligne (seconde ligne)
+    int index = (y * width + x) * channels;
 
-    // Affichage du résultat
+    unsigned char r = data[index];
+    unsigned char g = data[index + 1];
+    unsigned char b = data[index + 2];
+
     printf("second_line: %d, %d, %d\n", r, g, b);
-}*/
+    free(data);
+}
