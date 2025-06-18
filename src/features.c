@@ -194,3 +194,29 @@ void color_green(char *source_path) {
     }
 
 }
+
+void color_blue(char *source_path) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+
+    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image\n");
+        return;
+    }
+
+    int pixel_count = width * height;
+
+    // Pour chaque pixel, mettre R et G à 0 (on garde B)
+    for (int i = 0; i < pixel_count; i++) {
+        int index = i * channel_count;
+        data[index] = 0;       // R
+        data[index + 1] = 0;   // G
+        // B est à index + 2
+    }
+
+    // Écriture de l'image modifiée
+    if (write_image_data("image_out.bmp", data, width, height) == 0) {
+        fprintf(stderr, "Erreur lors de l'écriture de l'image\n");
+    }
+
+}
