@@ -16,6 +16,7 @@ void helloWorld() {
     printf("Hello World !");
 }
 
+
 void first_pixel(char *source_path) {
     unsigned char *data = NULL;
     int width, height, channels;
@@ -38,26 +39,21 @@ void first_pixel(char *source_path) {
 
 /*void second_line(char *source_path) {
     unsigned char *data;
-    int width, height, channels;
+    int width = 0, height = 0, channel_count = 0;
 
-    // Lecture de l'image
-    if (read_image_data(source_path, &data, &width, &height, &channels) == 0) {
-        fprintf(stderr, "Erreur lors de la lecture de l'image.\n");
-        return;
+    read_image_data(source_path, &data, &width, &height, &channel_count);
+    
+    unsigned char r = data[0];
+    unsigned char g = data[1];
+    unsigned char b = data[2];
+
+     int chiffreRetour = read_image_data(source_path, &data, &width, &height, &channel_count);
+     
+    if (chiffreRetour == 0){
+        printf("il y a un problème avec read_image_data");
     }
-
-    // Vérifie que l'image a au moins 2 lignes
-    if (height < 2) {
-        fprintf(stderr, "L'image doit avoir au moins 2 lignes.\n");
-        return;
+    else {
+        printf("first_pixel: %d, %d, %d\n", r, g, b);
     }
-
-    // Calcul de l'index du 1er pixel de la 2e ligne
-    int index = 3 * width;
-    int r = data[index];
-    int g = data[index + 1];
-    int b = data[index + 2];
-
-    // Affichage du résultat
-    printf("second_line: %d, %d, %d\n", r, g, b);
-}*/
+    
+};
