@@ -179,7 +179,9 @@ else if (strcmp(configuration.command, "min_component") == 0) {
     min_component(configuration.filenames[0], comp);
 }
 
-
+else if (strcmp(configuration.command, "stat_report") == 0) {
+    stat_report(configuration.filenames[0]);
+}
 
   return 0;
 }
