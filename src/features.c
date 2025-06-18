@@ -52,6 +52,25 @@ void first_pixel(char *source_path) {
     }
     
 }
+
+void second_line(char* sourcepath){
+    unsigned char* data;
+    int width, height, channel_count;
+
+    if (read_image_data(sourcepath, &data, &width, &height, &channel_count)){
+        if ( height >= 2 && channel_count > 3){
+            int index = (1 * width + 0) * channel_count;
+            printf("second_line : %d, %d, %d\n", data[index],data[index + 1],data[index + 2]);
+        } else {
+            printf("image trop petite");
+        }
+        free(data);
+    } else {
+        printf("Erreur Image");
+    }
+}
+
+
 void max_pixel(char *source_path) {
     unsigned char *data;
     int width;
