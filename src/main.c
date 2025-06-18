@@ -100,6 +100,56 @@ if (strcmp(configuration.command, "rotate_acw") == 0) {
     rotate_acw(configuration.filenames[0]);
 }
 
+else if (strcmp(configuration.command, "scale_bilinear") == 0) {
+    if (argc < 6) {
+        fprintf(stderr, "Usage: ./freud.exe -f <image> -c scale_bilinear <scale>\n");
+        return 1;
+    }
+
+    float scale = atof(argv[5]);
+    if (scale <= 0) {
+        fprintf(stderr, "Erreur : le facteur d'échelle doit être > 0\n");
+        return 1;
+    }
+
+    scale_bilinear(configuration.filenames[0], scale);
+}
+
+else if (strcmp(configuration.command, "scale_crop") == 0) {
+    if (argc < 9) {
+        fprintf(stderr, "Usage: ./freud.exe -f <image> -c scale_crop <center_x> <center_y> <width> <height>\n");
+        return 1;
+    }
+
+    int center_x = atoi(argv[5]);
+    int center_y = atoi(argv[6]);
+    int crop_width = atoi(argv[7]);
+    int crop_height = atoi(argv[8]);
+
+    scale_crop(configuration.filenames[0], center_x, center_y, crop_width, crop_height);
+}
+
+else if (strcmp(configuration.command, "scale_nearest") == 0) {
+    if (argc < 6) {
+        fprintf(stderr, "Usage: ./freud.exe -f <image> -c scale_nearest <scale>\n");
+        return 1;
+    }
+
+    float scale = atof(argv[5]);
+    if (scale <= 0) {
+        fprintf(stderr, "Erreur : le facteur d'échelle doit être > 0\n");
+        return 1;
+    }
+
+    scale_nearest(configuration.filenames[0], scale);
+}
+
+
+
+
+
+
+
   return 0;
 }
 

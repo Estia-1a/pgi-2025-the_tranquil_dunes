@@ -550,3 +550,153 @@ void rotate_acw(char *source_path) {
     }
 
 }
+
+void scale_bilinear(char *source_path, float scale) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+
+    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image.\n");
+        return;
+    }
+
+    int new_width = (int)(width * scale);
+    int new_height = (int)(height * scale);
+
+    unsigned char *scaled = malloc(new_width * new_height * channel_count);
+    if (scaled == NULL) {
+        fprintf(stderr, "Erreur d'allocation mémoire.\n");
+        return;
+    }
+
+    for (int y = 0; y < new_height; y++) {
+        float gy = ((float)y) / scale;
+        int y0 = (int)gy;
+        int y1 = y0 + 1;
+        float dy = gy - y0;
+
+        if (y1 >= height) y1 = height - 1;
+
+        for (int x = 0; x < new_width; x++) {
+            float gx = ((float)x) / scale;
+            int x0 = (int)gx;
+            int x1 = x0 + 1;
+            float dx = gx - x0;
+
+            if (x1 >= width) x1 = width - 1;
+
+            for (int c = 0; c < channel_count; c++) {
+                // Pixels Q11, Q12, Q21, Q22
+                float Q11 = data[(y0 * width + x0) * channel_count + c];
+                float Q21 = data[(y0 * width + x1) * channel_count + c];
+                float Q12 = data[(y1 * width + x0) * channel_count + c];
+                float Q22 = data[(y1 * width + x1) * channel_count + c];
+
+                // Interpolation horizontale
+                float R1 = Q11 * (1 - dx) + Q21 * dx;
+                float R2 = Q12 * (1 - dx) + Q22 * dx;
+
+                // Interpolation verticale
+                float P = R1 * (1 - dy) + R2 * dy;
+
+                // Affecter au pixel final
+                scaled[(y * new_width + x) * channel_count + c] = (unsigned char)(P);
+            }
+        }
+    }
+
+    if (write_image_data("image_out.bmp", scaled, new_width, new_height) == 0) {
+        fprintf(stderr, "Erreur lors de l'écriture de l'image\n");
+    }
+
+
+}
+
+void scale_crop(char *source_path, int center_x, int center_y, int crop_width, int crop_height) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+
+    // Lecture de l'image
+    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image.\n");
+        return;
+    }
+
+    // Calcul des coins du rectangle de découpe
+    int x0 = center_x - crop_width / 2;
+    int y0 = center_y - crop_height / 2;
+
+    // Sécuriser les bords
+    if (x0 < 0) x0 = 0;
+    if (y0 < 0) y0 = 0;
+    if (x0 + crop_width > width)  x0 = width - crop_width;
+    if (y0 + crop_height > height) y0 = height - crop_height;
+    if (x0 < 0) x0 = 0;
+    if (y0 < 0) y0 = 0;
+
+    unsigned char *cropped = malloc(crop_width * crop_height * channel_count);
+    if (cropped == NULL) {
+        fprintf(stderr, "Erreur d'allocation mémoire.\n");
+        return;
+    }
+
+    // Copie des pixels
+    for (int y = 0; y < crop_height; y++) {
+        for (int x = 0; x < crop_width; x++) {
+            int src_index = ((y0 + y) * width + (x0 + x)) * channel_count;
+            int dst_index = (y * crop_width + x) * channel_count;
+
+            for (int c = 0; c < channel_count; c++) {
+                cropped[dst_index + c] = data[src_index + c];
+            }
+        }
+    }
+
+    if (write_image_data("image_out.bmp", cropped, crop_width, crop_height) == 0) {
+        fprintf(stderr, "Erreur lors de l'écriture de l'image cropée.\n");
+    }
+
+}
+
+void scale_nearest(char *source_path, float scale) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+
+    // Lire l'image source
+    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image.\n");
+        return;
+    }
+
+    int new_width = (int)(width * scale);
+    int new_height = (int)(height * scale);
+
+    unsigned char *resized = malloc(new_width * new_height * channel_count);
+    if (resized == NULL) {
+        fprintf(stderr, "Erreur d'allocation mémoire.\n");
+        return;
+    }
+
+    // Redimensionnement
+    for (int y = 0; y < new_height; y++) {
+        int src_y = (int)(y / scale);
+        if (src_y >= height) src_y = height - 1;
+
+        for (int x = 0; x < new_width; x++) {
+            int src_x = (int)(x / scale);
+            if (src_x >= width) src_x = width - 1;
+
+            int src_index = (src_y * width + src_x) * channel_count;
+            int dst_index = (y * new_width + x) * channel_count;
+
+            for (int c = 0; c < channel_count; c++) {
+                resized[dst_index + c] = data[src_index + c];
+            }
+        }
+    }
+
+    if (write_image_data("image_out.bmp", resized, new_width, new_height) == 0) {
+        fprintf(stderr, "Erreur lors de l'écriture de l'image redimensionnée.\n");
+    }
+
+}
