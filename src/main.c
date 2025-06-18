@@ -72,6 +72,10 @@ if (strncmp(configuration.command, "color_gray_luminance", 9) == 0) {
   color_gray_luminance(configuration.filenames[0]);
 }
 
+if (strncmp(configuration.command, "color_invert", 9) == 0) {
+  color_invert(configuration.filenames[0]);
+}
+
   return 0;
 }
 
