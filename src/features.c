@@ -287,3 +287,30 @@ void color_gray_luminance(char *source_path) {
     }
 
 }
+
+void color_invert(char *source_path) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+
+    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image\n");
+        return;
+    }
+
+    int pixel_count = width * height;
+
+    // Inversion des couleurs
+    for (int i = 0; i < pixel_count; i++) {
+        int index = i * channel_count;
+        data[index]     = 255 - data[index];     // R
+        data[index + 1] = 255 - data[index + 1]; // G
+        data[index + 2] = 255 - data[index + 2]; // B
+        // Ne pas toucher au canal alpha s'il existe
+    }
+
+    // Sauvegarder l'image modifiée
+    if (write_image_data("image_out.bmp", data, width, height) == 0) {
+        fprintf(stderr, "Erreur lors de l'écriture de l'image\n");
+    }
+
+}
