@@ -254,3 +254,36 @@ void color_gray(char *source_path) {
     }
 
 }
+
+void color_gray_luminance(char *source_path) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+
+    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image\n");
+        return;
+    }
+
+    int pixel_count = width * height;
+
+    // Appliquer la formule de luminance pour chaque pixel
+    for (int i = 0; i < pixel_count; i++) {
+        int index = i * channel_count;
+
+        unsigned char R = data[index];
+        unsigned char G = data[index + 1];
+        unsigned char B = data[index + 2];
+
+        unsigned char gray = (unsigned char)(0.21 * R + 0.72 * G + 0.07 * B);
+
+        data[index]     = gray;
+        data[index + 1] = gray;
+        data[index + 2] = gray;
+    }
+
+    // Sauvegarder l'image modifiée
+    if (write_image_data("image_out.bmp", data, width, height) == 0) {
+        fprintf(stderr, "Erreur lors de l'écriture de l'image\n");
+    }
+
+}
