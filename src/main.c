@@ -67,6 +67,11 @@ if (strncmp(configuration.command, "color_blue", 9) == 0) {
 if (strncmp(configuration.command, "color_gray", 9) == 0) {
   color_gray(configuration.filenames[0]);
 }
+
+if (strncmp(configuration.command, "color_gray_luminance", 9) == 0) {
+  color_gray_luminance(configuration.filenames[0]);
+}
+
   return 0;
 }
 
