@@ -145,3 +145,22 @@ void min_pixel(char *source_path) {
         printf("min_pixel (%d, %d): %d, %d, %d\n", min_x, min_y, min_pixel->r, min_pixel->g, min_pixel->b);
     }
 }
+
+void print_pixel(char *filename, int x, int y) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+ 
+    if (read_image_data(filename, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image.\n");
+        return;
+    }
+ 
+    pixelRGB *pixel = get_pixel(data, width, height, channel_count, x, y);
+ 
+    if (pixel == NULL) {
+        fprintf(stderr, "Pixel (%d, %d) hors de l'image.\n", x, y);
+        return;
+    }
+ 
+    printf("print_pixel (%d, %d): %d, %d, %d\n", x, y, pixel->r, pixel->g, pixel->b);
+}
