@@ -357,3 +357,40 @@ void color_desaturate(char *source_path) {
 
 }
 
+void mirror_total(char *source_path) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+
+    // Lecture de l'image
+    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image\n");
+        return;
+    }
+
+    int pixel_count = width * height;
+    int image_size = pixel_count * channel_count;
+
+    // Allouer de la mémoire pour l'image retournée
+    unsigned char *mirrored = malloc(image_size * sizeof(unsigned char));
+    if (mirrored == NULL) {
+        fprintf(stderr, "Erreur d'allocation mémoire\n");
+        free(data);
+        return;
+    }
+
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            int src_index = (y * width + x) * channel_count;
+            int dest_index = ((height - 1 - y) * width + (width - 1 - x)) * channel_count;
+
+            for (int c = 0; c < channel_count; c++) {
+                mirrored[dest_index + c] = data[src_index + c];
+            }
+        }
+    }
+
+    if (write_image_data("image_out.bmp", mirrored, width, height) == 0) {
+        fprintf(stderr, "Erreur lors de l'écriture de l'image miroir\n");
+    }
+
+}
