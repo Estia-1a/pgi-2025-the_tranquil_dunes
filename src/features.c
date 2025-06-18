@@ -1,6 +1,6 @@
 #include <estia-image.h>
 #include <stdio.h>
-
+#include <stdlib.h>
 #include "features.h"
 #include "utils.h"
 
@@ -31,7 +31,7 @@ void first_pixel(char *source_path) {
 
     printf("first_pixel: %d, %d, %d\n", R, G, B);
 
-    // Libération de la mémoire si nécessaire (selon l'implémentation de read_image_data)
+    
     free(data);
 }
 
