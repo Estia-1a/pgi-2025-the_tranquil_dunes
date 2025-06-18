@@ -169,7 +169,15 @@ else if (strcmp(configuration.command, "max_component") == 0) {
     max_component(configuration.filenames[0], comp);
 }
 
-
+else if (strcmp(configuration.command, "min_component") == 0) {
+    if (argc < 6) {
+        fprintf(stderr, "Usage: -c min_component <R|G|B>\n");
+        return 1;
+    }
+ 
+    char comp = argv[5][0];
+    min_component(configuration.filenames[0], comp);
+}
 
 
 
