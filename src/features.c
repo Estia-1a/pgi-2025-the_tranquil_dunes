@@ -566,7 +566,6 @@ void scale_bilinear(char *source_path, float scale) {
     unsigned char *scaled = malloc(new_width * new_height * channel_count);
     if (scaled == NULL) {
         fprintf(stderr, "Erreur d'allocation mémoire.\n");
-        free(data);
         return;
     }
 
@@ -610,5 +609,51 @@ void scale_bilinear(char *source_path, float scale) {
         fprintf(stderr, "Erreur lors de l'écriture de l'image\n");
     }
 
+
+}
+
+void scale_crop(char *source_path, int center_x, int center_y, int crop_width, int crop_height) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+
+    // Lecture de l'image
+    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image.\n");
+        return;
+    }
+
+    // Calcul des coins du rectangle de découpe
+    int x0 = center_x - crop_width / 2;
+    int y0 = center_y - crop_height / 2;
+
+    // Sécuriser les bords
+    if (x0 < 0) x0 = 0;
+    if (y0 < 0) y0 = 0;
+    if (x0 + crop_width > width)  x0 = width - crop_width;
+    if (y0 + crop_height > height) y0 = height - crop_height;
+    if (x0 < 0) x0 = 0;
+    if (y0 < 0) y0 = 0;
+
+    unsigned char *cropped = malloc(crop_width * crop_height * channel_count);
+    if (cropped == NULL) {
+        fprintf(stderr, "Erreur d'allocation mémoire.\n");
+        return;
+    }
+
+    // Copie des pixels
+    for (int y = 0; y < crop_height; y++) {
+        for (int x = 0; x < crop_width; x++) {
+            int src_index = ((y0 + y) * width + (x0 + x)) * channel_count;
+            int dst_index = (y * crop_width + x) * channel_count;
+
+            for (int c = 0; c < channel_count; c++) {
+                cropped[dst_index + c] = data[src_index + c];
+            }
+        }
+    }
+
+    if (write_image_data("image_out.bmp", cropped, crop_width, crop_height) == 0) {
+        fprintf(stderr, "Erreur lors de l'écriture de l'image cropée.\n");
+    }
 
 }
