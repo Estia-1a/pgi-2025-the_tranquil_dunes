@@ -727,6 +727,8 @@ void scale_nearest(char *source_path, float scale) {
         fprintf(stderr, "Erreur lors de l'écriture de l'image redimensionnée.\n");
     }
 
+}
+
 void print_pixel(char *filename, int x, int y) {
     unsigned char *data = NULL;
     int width, height, channel_count;
@@ -744,4 +746,170 @@ void print_pixel(char *filename, int x, int y) {
     }
  
     printf("print_pixel (%d, %d): %d, %d, %d\n", x, y, pixel->r, pixel->g, pixel->b);
+}
+
+void max_component(char *filename, char component) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+ 
+    if (read_image_data(filename, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image.\n");
+        return;
+    }
+ 
+    int max_value = -1;
+    int max_x = -1, max_y = -1;
+ 
+    int c_index = 0; // 0: R, 1: G, 2: B
+    if (component == 'R') c_index = 0;
+    else if (component == 'G') c_index = 1;
+    else if (component == 'B') c_index = 2;
+    else {
+        fprintf(stderr, "Composante invalide : %c (utiliser R, G ou B)\n", component);
+        return;
+    }
+ 
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            int index = (y * width + x) * channel_count;
+            if (channel_count < 3) continue;  // sécurité
+ 
+            int value = data[index + c_index];
+            if (value > max_value) {
+                max_value = value;
+                max_x = x;
+                max_y = y;
+            }
+        }
+    }
+ 
+    if (max_value >= 0)
+        printf("max_component %c (%d, %d): %d\n", component, max_x, max_y, max_value);
+    else
+        printf("Aucune valeur maximale trouvée.\n");
+ 
+}
+
+
+void min_component(char *filename, char component) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+ 
+    if (read_image_data(filename, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image.\n");
+        return;
+    }
+ 
+    int min_value = 256;  // car max d'un channel est 255
+    int min_x = -1, min_y = -1;
+ 
+    int c_index = 0;
+    if (component == 'R') c_index = 0;
+    else if (component == 'G') c_index = 1;
+    else if (component == 'B') c_index = 2;
+    else {
+        fprintf(stderr, "Composante invalide : %c (utiliser R, G ou B)\n", component);
+        return;
+    }
+ 
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            int index = (y * width + x) * channel_count;
+ 
+            if (channel_count < 3) continue;
+ 
+            int value = data[index + c_index];
+            if (value < min_value) {
+                min_value = value;
+                min_x = x;
+                min_y = y;
+ 
+                // optimisation : si 0 trouvé, pas besoin de continuer
+                if (min_value == 0) break;
+            }
+        }
+        if (min_value == 0) break;
+    }
+ 
+    if (min_value < 256)
+        printf("min_component %c (%d, %d): %d\n", component, min_x, min_y, min_value);
+    else
+        printf("Aucune valeur minimale trouvée.\n");
+ 
+}
+
+
+void stat_report(char *filename) {
+    unsigned char *data = NULL;
+    int width, height, n;
+ 
+    if (read_image_data(filename, &data, &width, &height, &n) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image.\n");
+        return;
+    }
+ 
+    FILE *f = fopen("stat_report.txt", "w");
+    if (!f) {
+        fprintf(stderr, "Impossible de créer stat_report.txt\n");
+
+        return;
+    }
+ 
+    int max_pixel_sum = -1, min_pixel_sum = 256 * 3 + 1;
+    int max_px_x = 0, max_px_y = 0;
+    int min_px_x = 0, min_px_y = 0;
+ 
+    int max_r = -1, max_g = -1, max_b = -1;
+    int min_r = 256, min_g = 256, min_b = 256;
+    int max_rx = 0, max_ry = 0, max_gx = 0, max_gy = 0, max_bx = 0, max_by = 0;
+    int min_rx = 0, min_ry = 0, min_gx = 0, min_gy = 0, min_bx = 0, min_by = 0;
+ 
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            int idx = (y * width + x) * n;
+            unsigned char R = data[idx];
+            unsigned char G = data[idx + 1];
+            unsigned char B = data[idx + 2];
+ 
+            int sum = R + G + B;
+ 
+            if (sum > max_pixel_sum) {
+                max_pixel_sum = sum;
+                max_px_x = x; max_px_y = y;
+            }
+ 
+            if (sum < min_pixel_sum) {
+                min_pixel_sum = sum;
+                min_px_x = x; min_px_y = y;
+            }
+ 
+            if (R > max_r) { max_r = R; max_rx = x; max_ry = y; }
+            if (G > max_g) { max_g = G; max_gx = x; max_gy = y; }
+            if (B > max_b) { max_b = B; max_bx = x; max_by = y; }
+ 
+            if (R < min_r) { min_r = R; min_rx = x; min_ry = y; }
+            if (G < min_g) { min_g = G; min_gx = x; min_gy = y; }
+            if (B < min_b) { min_b = B; min_bx = x; min_by = y; }
+        }
+    }
+ 
+    fprintf(f, "max_pixel (%d, %d): %d\n", max_px_x, max_px_y, max_pixel_sum);
+    fprintf(f, "\n");
+    fprintf(f, "min_pixel (%d, %d): %d\n", min_px_x, min_px_y, min_pixel_sum);
+    fprintf(f, "\n");
+    fprintf(f, "max_component R (%d, %d): %d\n", max_rx, max_ry, max_r);
+    fprintf(f, "\n");
+    fprintf(f, "max_component G (%d, %d): %d\n", max_gx, max_gy, max_g);
+    fprintf(f, "\n");
+    fprintf(f, "max_component B (%d, %d): %d\n", max_bx, max_by, max_b);
+    fprintf(f, "\n");
+    fprintf(f, "min_component R (%d, %d): %d\n", min_rx, min_ry, min_r);
+    fprintf(f, "\n");
+    fprintf(f, "min_component G (%d, %d): %d\n", min_gx, min_gy, min_g);
+    fprintf(f, "\n");
+    fprintf(f, "min_component B (%d, %d): %d\n", min_bx, min_by, min_b);
+    fprintf(f, "\n");
+ 
+    fclose(f);
+    
 }

@@ -48,4 +48,10 @@ void scale_nearest(char *source_path, float scale);
 
 void print_pixel(char *filename, int x, int y);
 
+void max_component(char *filename, char component);
+
+void min_component(char *filename, char component);
+
+void stat_report(char *filename);
+
 #endif
