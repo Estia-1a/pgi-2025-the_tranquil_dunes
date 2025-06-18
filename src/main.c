@@ -173,7 +173,6 @@ else if (strcmp(configuration.command, "max_component") == 0) {
 
 
 
-
   return 0;
 }
 

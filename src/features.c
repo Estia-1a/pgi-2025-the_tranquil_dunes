@@ -727,6 +727,8 @@ void scale_nearest(char *source_path, float scale) {
         fprintf(stderr, "Erreur lors de l'écriture de l'image redimensionnée.\n");
     }
 
+}
+
 void print_pixel(char *filename, int x, int y) {
     unsigned char *data = NULL;
     int width, height, channel_count;
@@ -744,4 +746,46 @@ void print_pixel(char *filename, int x, int y) {
     }
  
     printf("print_pixel (%d, %d): %d, %d, %d\n", x, y, pixel->r, pixel->g, pixel->b);
+}
+
+void max_component(char *filename, char component) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+ 
+    if (read_image_data(filename, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image.\n");
+        return;
+    }
+ 
+    int max_value = -1;
+    int max_x = -1, max_y = -1;
+ 
+    int c_index = 0; // 0: R, 1: G, 2: B
+    if (component == 'R') c_index = 0;
+    else if (component == 'G') c_index = 1;
+    else if (component == 'B') c_index = 2;
+    else {
+        fprintf(stderr, "Composante invalide : %c (utiliser R, G ou B)\n", component);
+        return;
+    }
+ 
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            int index = (y * width + x) * channel_count;
+            if (channel_count < 3) continue;  // sécurité
+ 
+            int value = data[index + c_index];
+            if (value > max_value) {
+                max_value = value;
+                max_x = x;
+                max_y = y;
+            }
+        }
+    }
+ 
+    if (max_value >= 0)
+        printf("max_component %c (%d, %d): %d\n", component, max_x, max_y, max_value);
+    else
+        printf("Aucune valeur maximale trouvée.\n");
+ 
 }
