@@ -466,3 +466,87 @@ void mirror_horizontal(char *source_path) {
     }
 
 }
+
+void rotate_cw(char *source_path) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+
+    // Lire l'image d'entrée
+    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image\n");
+        return;
+    }
+
+    int new_width = height;
+    int new_height = width;
+    int image_size = new_width * new_height * channel_count;
+
+    unsigned char *rotated = malloc(image_size);
+    if (rotated == NULL) {
+        fprintf(stderr, "Erreur d'allocation mémoire\n");
+        free(data);
+        return;
+    }
+
+    // Appliquer la rotation 90° sens horaire
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            int src_index = (y * width + x) * channel_count;
+            int dst_x = height - 1 - y;
+            int dst_y = x;
+            int dst_index = (dst_y * new_width + dst_x) * channel_count;
+
+            for (int c = 0; c < channel_count; c++) {
+                rotated[dst_index + c] = data[src_index + c];
+            }
+        }
+    }
+
+    // Sauvegarde dans un nouveau fichier
+    if (write_image_data("image_out.bmp", rotated, new_width, new_height) == 0) {
+        fprintf(stderr, "Erreur lors de l'écriture de l'image\n");
+    }
+
+}
+
+void rotate_acw(char *source_path) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+
+    // Lire l'image d'entrée
+    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image\n");
+        return;
+    }
+
+    int new_width = height;
+    int new_height = width;
+    int image_size = new_width * new_height * channel_count;
+
+    unsigned char *rotated = malloc(image_size);
+    if (rotated == NULL) {
+        fprintf(stderr, "Erreur d'allocation mémoire\n");
+        free(data);
+        return;
+    }
+
+    // Appliquer la rotation 90° anti-horaire
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            int src_index = (y * width + x) * channel_count;
+            int dst_x = y;
+            int dst_y = width - 1 - x;
+            int dst_index = (dst_y * new_width + dst_x) * channel_count;
+
+            for (int c = 0; c < channel_count; c++) {
+                rotated[dst_index + c] = data[src_index + c];
+            }
+        }
+    }
+
+    // Écriture de l'image tournée
+    if (write_image_data("image_out.bmp", rotated, new_width, new_height) == 0) {
+        fprintf(stderr, "Erreur lors de l'écriture de l'image\n");
+    }
+
+}
