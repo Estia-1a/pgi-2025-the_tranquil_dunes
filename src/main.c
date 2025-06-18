@@ -129,6 +129,21 @@ else if (strcmp(configuration.command, "scale_crop") == 0) {
     scale_crop(configuration.filenames[0], center_x, center_y, crop_width, crop_height);
 }
 
+else if (strcmp(configuration.command, "scale_nearest") == 0) {
+    if (argc < 6) {
+        fprintf(stderr, "Usage: ./freud.exe -f <image> -c scale_nearest <scale>\n");
+        return 1;
+    }
+
+    float scale = atof(argv[5]);
+    if (scale <= 0) {
+        fprintf(stderr, "Erreur : le facteur d'échelle doit être > 0\n");
+        return 1;
+    }
+
+    scale_nearest(configuration.filenames[0], scale);
+}
+
 
 
 
