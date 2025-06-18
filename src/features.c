@@ -3,6 +3,7 @@
 
 #include "features.h"
 #include "utils.h"
+#include <stdlib.h>
 
 
 /**
@@ -351,6 +352,200 @@ void color_desaturate(char *source_path) {
     }
 
     if (write_image_data("image_out.bmp", data, width, height) == 0) {
+        fprintf(stderr, "Erreur lors de l'écriture de l'image\n");
+    }
+
+}
+
+void mirror_total(char *source_path) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+
+    // Lecture de l'image
+    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image\n");
+        return;
+    }
+
+    int pixel_count = width * height;
+    int image_size = pixel_count * channel_count;
+
+    // Allouer de la mémoire pour l'image retournée
+    unsigned char *mirrored = malloc(image_size * sizeof(unsigned char));
+    if (mirrored == NULL) {
+        fprintf(stderr, "Erreur d'allocation mémoire\n");
+        free(data);
+        return;
+    }
+
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            int src_index = (y * width + x) * channel_count;
+            int dest_index = ((height - 1 - y) * width + (width - 1 - x)) * channel_count;
+
+            for (int c = 0; c < channel_count; c++) {
+                mirrored[dest_index + c] = data[src_index + c];
+            }
+        }
+    }
+
+    if (write_image_data("image_out.bmp", mirrored, width, height) == 0) {
+        fprintf(stderr, "Erreur lors de l'écriture de l'image miroir\n");
+    }
+
+}
+
+void mirror_vertical(char *source_path) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+
+    // Lecture de l'image
+    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image\n");
+        return;
+    }
+
+    int image_size = width * height * channel_count;
+    unsigned char *mirrored = malloc(image_size);
+    if (mirrored == NULL) {
+        fprintf(stderr, "Erreur d'allocation mémoire\n");
+        free(data);
+        return;
+    }
+
+    // Pour chaque ligne
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            int src_index = (y * width + x) * channel_count;
+            int dst_index = (y * width + (width - 1 - x)) * channel_count;
+
+            for (int c = 0; c < channel_count; c++) {
+                mirrored[dst_index + c] = data[src_index + c];
+            }
+        }
+    }
+
+    if (write_image_data("image_out.bmp", mirrored, width, height) == 0) {
+        fprintf(stderr, "Erreur lors de l'écriture de l'image\n");
+    }
+
+}
+
+void mirror_horizontal(char *source_path) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+
+    // Lire l'image
+    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image\n");
+        return;
+    }
+
+    int image_size = width * height * channel_count;
+    unsigned char *mirrored = malloc(image_size);
+    if (mirrored == NULL) {
+        fprintf(stderr, "Erreur d'allocation mémoire\n");
+        free(data);
+        return;
+    }
+
+    // Appliquer la symétrie verticale (haut ↔ bas)
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            int src_index = (y * width + x) * channel_count;
+            int dst_index = ((height - 1 - y) * width + x) * channel_count;
+
+            for (int c = 0; c < channel_count; c++) {
+                mirrored[dst_index + c] = data[src_index + c];
+            }
+        }
+    }
+
+    if (write_image_data("image_out.bmp", mirrored, width, height) == 0) {
+        fprintf(stderr, "Erreur lors de l'écriture de l'image\n");
+    }
+
+}
+
+void rotate_cw(char *source_path) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+
+    // Lire l'image d'entrée
+    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image\n");
+        return;
+    }
+
+    int new_width = height;
+    int new_height = width;
+    int image_size = new_width * new_height * channel_count;
+
+    unsigned char *rotated = malloc(image_size);
+    if (rotated == NULL) {
+        fprintf(stderr, "Erreur d'allocation mémoire\n");
+        free(data);
+        return;
+    }
+
+    // Appliquer la rotation 90° sens horaire
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            int src_index = (y * width + x) * channel_count;
+            int dst_x = height - 1 - y;
+            int dst_y = x;
+            int dst_index = (dst_y * new_width + dst_x) * channel_count;
+
+            for (int c = 0; c < channel_count; c++) {
+                rotated[dst_index + c] = data[src_index + c];
+            }
+        }
+    }
+
+    // Sauvegarde dans un nouveau fichier
+    if (write_image_data("image_out.bmp", rotated, new_width, new_height) == 0) {
+        fprintf(stderr, "Erreur lors de l'écriture de l'image\n");
+    }
+
+}
+
+void rotate_acw(char *source_path) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+
+    // Lire l'image d'entrée
+    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image\n");
+        return;
+    }
+
+    int new_width = height;
+    int new_height = width;
+    int image_size = new_width * new_height * channel_count;
+
+    unsigned char *rotated = malloc(image_size);
+    if (rotated == NULL) {
+        fprintf(stderr, "Erreur d'allocation mémoire\n");
+        free(data);
+        return;
+    }
+
+    // Appliquer la rotation 90° anti-horaire
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            int src_index = (y * width + x) * channel_count;
+            int dst_x = y;
+            int dst_y = width - 1 - x;
+            int dst_index = (dst_y * new_width + dst_x) * channel_count;
+
+            for (int c = 0; c < channel_count; c++) {
+                rotated[dst_index + c] = data[src_index + c];
+            }
+        }
+    }
+
+    // Écriture de l'image tournée
+    if (write_image_data("image_out.bmp", rotated, new_width, new_height) == 0) {
         fprintf(stderr, "Erreur lors de l'écriture de l'image\n");
     }
 

@@ -13,6 +13,7 @@
     "files.associations": {
         "unistd.h": "c",
         "stdio.h": "c",
-        "stddef.h": "c"
+        "stddef.h": "c",
+        "estia-image.h": "c"
     },
 }
