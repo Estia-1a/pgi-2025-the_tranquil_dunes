@@ -657,3 +657,46 @@ void scale_crop(char *source_path, int center_x, int center_y, int crop_width, i
     }
 
 }
+
+void scale_nearest(char *source_path, float scale) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+
+    // Lire l'image source
+    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image.\n");
+        return;
+    }
+
+    int new_width = (int)(width * scale);
+    int new_height = (int)(height * scale);
+
+    unsigned char *resized = malloc(new_width * new_height * channel_count);
+    if (resized == NULL) {
+        fprintf(stderr, "Erreur d'allocation mémoire.\n");
+        return;
+    }
+
+    // Redimensionnement
+    for (int y = 0; y < new_height; y++) {
+        int src_y = (int)(y / scale);
+        if (src_y >= height) src_y = height - 1;
+
+        for (int x = 0; x < new_width; x++) {
+            int src_x = (int)(x / scale);
+            if (src_x >= width) src_x = width - 1;
+
+            int src_index = (src_y * width + src_x) * channel_count;
+            int dst_index = (y * new_width + x) * channel_count;
+
+            for (int c = 0; c < channel_count; c++) {
+                resized[dst_index + c] = data[src_index + c];
+            }
+        }
+    }
+
+    if (write_image_data("image_out.bmp", resized, new_width, new_height) == 0) {
+        fprintf(stderr, "Erreur lors de l'écriture de l'image redimensionnée.\n");
+    }
+
+}
