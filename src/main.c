@@ -51,6 +51,18 @@ int main(int argc, char **argv) {
   min_pixel(configuration.filenames[0]);
   }
 
+  else if (strcmp(configuration.command, "print_pixel") == 0) {
+    if (argc < 7) {
+        fprintf(stderr, "Usage: -c print_pixel <x> <y>\n");
+        return 1;
+    }
+ 
+    int x = atoi(argv[5]);
+    int y = atoi(argv[6]);
+ 
+    print_pixel(configuration.filenames[0], x, y);
+  }
+
   return 0;
 }
 
