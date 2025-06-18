@@ -430,3 +430,39 @@ void mirror_vertical(char *source_path) {
     }
 
 }
+
+void mirror_horizontal(char *source_path) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+
+    // Lire l'image
+    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image\n");
+        return;
+    }
+
+    int image_size = width * height * channel_count;
+    unsigned char *mirrored = malloc(image_size);
+    if (mirrored == NULL) {
+        fprintf(stderr, "Erreur d'allocation mémoire\n");
+        free(data);
+        return;
+    }
+
+    // Appliquer la symétrie verticale (haut ↔ bas)
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            int src_index = (y * width + x) * channel_count;
+            int dst_index = ((height - 1 - y) * width + x) * channel_count;
+
+            for (int c = 0; c < channel_count; c++) {
+                mirrored[dst_index + c] = data[src_index + c];
+            }
+        }
+    }
+
+    if (write_image_data("image_out.bmp", mirrored, width, height) == 0) {
+        fprintf(stderr, "Erreur lors de l'écriture de l'image\n");
+    }
+
+}
