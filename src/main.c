@@ -159,6 +159,15 @@ else if (strcmp(configuration.command, "scale_nearest") == 0) {
     scale_nearest(configuration.filenames[0], scale);
 }
 
+else if (strcmp(configuration.command, "max_component") == 0) {
+    if (argc < 6) {
+        fprintf(stderr, "Usage: -c max_component <R|G|B>\n");
+        return 1;
+    }
+ 
+    char comp = argv[5][0];
+    max_component(configuration.filenames[0], comp);
+}
 
 
 
