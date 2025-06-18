@@ -143,3 +143,215 @@ void tenth_pixel(char *source_path) {
     printf("tenth_pixel: %d, %d, %d\n", R, G, B);
 
 }
+
+void color_red(char *source_path) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+
+    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image.\n");
+        return;
+    }
+
+    int pixel_count = width * height;
+
+    for (int i = 0; i < pixel_count; i++) {
+        int index = i * channel_count;
+        // Garder R, mettre G et B à 0
+        data[index + 1] = 0; // Green
+        data[index + 2] = 0; // Blue
+        // Si image avec alpha (4 canaux), ne pas toucher data[index + 3]
+    }
+
+    // Écrire dans un nouveau fichier
+    if (write_image_data("image_out.bmp", data, width, height) == 0) {
+        fprintf(stderr, "Erreur lors de l'écriture de l'image.\n");
+    }
+
+}
+
+void color_green(char *source_path) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+
+    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image\n");
+        return;
+    }
+
+    int pixel_count = width * height;
+
+    for (int i = 0; i < pixel_count; i++) {
+        int index = i * channel_count;
+        data[index] = 0;       // R
+        data[index + 2] = 0;   // B
+        // On laisse G (index + 1)
+    }
+
+    // Sauvegarder dans une nouvelle image
+    if (write_image_data("image_out.bmp", data, width, height) == 0) {
+        fprintf(stderr, "Erreur lors de l'écriture de l'image\n");
+    }
+
+}
+
+void color_blue(char *source_path) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+
+    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image\n");
+        return;
+    }
+
+    int pixel_count = width * height;
+
+    // Pour chaque pixel, mettre R et G à 0 (on garde B)
+    for (int i = 0; i < pixel_count; i++) {
+        int index = i * channel_count;
+        data[index] = 0;       // R
+        data[index + 1] = 0;   // G
+        // B est à index + 2
+    }
+
+    // Écriture de l'image modifiée
+    if (write_image_data("image_out.bmp", data, width, height) == 0) {
+        fprintf(stderr, "Erreur lors de l'écriture de l'image\n");
+    }
+
+}
+
+void color_gray(char *source_path) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+
+    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image\n");
+        return;
+    }
+
+    int pixel_count = width * height;
+
+    // Pour chaque pixel, on calcule la moyenne R, G, B
+    for (int i = 0; i < pixel_count; i++) {
+        int index = i * channel_count;
+
+        unsigned char R = data[index];
+        unsigned char G = data[index + 1];
+        unsigned char B = data[index + 2];
+
+        unsigned char gray = (R + G + B) / 3;
+
+        data[index]     = gray;
+        data[index + 1] = gray;
+        data[index + 2] = gray;
+        // Si canal alpha présent, on ne le touche pas
+    }
+
+    // Écriture du fichier de sortie
+    if (write_image_data("image_out.bmp", data, width, height) == 0) {
+        fprintf(stderr, "Erreur lors de l'écriture de l'image\n");
+    }
+
+}
+
+void color_gray_luminance(char *source_path) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+
+    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image\n");
+        return;
+    }
+
+    int pixel_count = width * height;
+
+    // Appliquer la formule de luminance pour chaque pixel
+    for (int i = 0; i < pixel_count; i++) {
+        int index = i * channel_count;
+
+        unsigned char R = data[index];
+        unsigned char G = data[index + 1];
+        unsigned char B = data[index + 2];
+
+        unsigned char gray = (unsigned char)(0.21 * R + 0.72 * G + 0.07 * B);
+
+        data[index]     = gray;
+        data[index + 1] = gray;
+        data[index + 2] = gray;
+    }
+
+    // Sauvegarder l'image modifiée
+    if (write_image_data("image_out.bmp", data, width, height) == 0) {
+        fprintf(stderr, "Erreur lors de l'écriture de l'image\n");
+    }
+
+}
+
+void color_invert(char *source_path) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+
+    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image\n");
+        return;
+    }
+
+    int pixel_count = width * height;
+
+    // Inversion des couleurs
+    for (int i = 0; i < pixel_count; i++) {
+        int index = i * channel_count;
+        data[index]     = 255 - data[index];     // R
+        data[index + 1] = 255 - data[index + 1]; // G
+        data[index + 2] = 255 - data[index + 2]; // B
+        // Ne pas toucher au canal alpha s'il existe
+    }
+
+    // Sauvegarder l'image modifiée
+    if (write_image_data("image_out.bmp", data, width, height) == 0) {
+        fprintf(stderr, "Erreur lors de l'écriture de l'image\n");
+    }
+
+}
+
+void color_desaturate(char *source_path) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+
+    // Lire l'image
+    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image\n");
+        return;
+    }
+
+    int pixel_count = width * height;
+
+    // Désaturation de chaque pixel
+    for (int i = 0; i < pixel_count; i++) {
+        int index = i * channel_count;
+
+        unsigned char R = data[index];
+        unsigned char G = data[index + 1];
+        unsigned char B = data[index + 2];
+
+        unsigned char min_val = R;
+        if (G < min_val) min_val = G;
+        if (B < min_val) min_val = B;
+
+        unsigned char max_val = R;
+        if (G > max_val) max_val = G;
+        if (B > max_val) max_val = B;
+
+        unsigned char desaturated = (min_val + max_val) / 2;
+
+        data[index]     = desaturated;
+        data[index + 1] = desaturated;
+        data[index + 2] = desaturated;
+    }
+
+    if (write_image_data("image_out.bmp", data, width, height) == 0) {
+        fprintf(stderr, "Erreur lors de l'écriture de l'image\n");
+    }
+
+}
