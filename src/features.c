@@ -53,6 +53,34 @@ void first_pixel(char *source_path) {
     }
     
 }
+
+void second_line(char *source_path) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+ 
+    
+    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image\n");
+        return;
+    }
+ 
+    if (height < 2) {
+        fprintf(stderr, "L'image doit avoir au moins 2 lignes.\n");
+        return;
+    }
+ 
+
+    int index = width * channel_count;  
+ 
+    int R = data[index];
+    int G = data[index + 1];
+    int B = data[index + 2];
+ 
+    printf("second_line: %d, %d, %d\n", R, G, B);
+ 
+}
+
+
 void max_pixel(char *source_path) {
     unsigned char *data;
     int width;
@@ -699,4 +727,21 @@ void scale_nearest(char *source_path, float scale) {
         fprintf(stderr, "Erreur lors de l'écriture de l'image redimensionnée.\n");
     }
 
+void print_pixel(char *filename, int x, int y) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+ 
+    if (read_image_data(filename, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image.\n");
+        return;
+    }
+ 
+    pixelRGB *pixel = get_pixel(data, width, height, channel_count, x, y);
+ 
+    if (pixel == NULL) {
+        fprintf(stderr, "Pixel (%d, %d) hors de l'image.\n", x, y);
+        return;
+    }
+ 
+    printf("print_pixel (%d, %d): %d, %d, %d\n", x, y, pixel->r, pixel->g, pixel->b);
 }

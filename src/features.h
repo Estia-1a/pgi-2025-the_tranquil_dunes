@@ -8,6 +8,8 @@ void dimension(char*source_path);
 
 void first_pixel (char *source_path);
 
+void second_line (char *source_path); 
+
 void max_pixel (char *source_path);
 
 void min_pixel (char *source_path);
@@ -44,5 +46,6 @@ void scale_crop(char *source_path, int center_x, int center_y, int crop_width, i
 
 void scale_nearest(char *source_path, float scale);
 
+void print_pixel(char *filename, int x, int y);
 
 #endif

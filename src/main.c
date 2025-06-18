@@ -36,17 +36,32 @@ int main(int argc, char **argv) {
     dimension(configuration.filenames[0]);
   }
   if ( strncmp( configuration.command, "first_pixel", 11 ) == 0 ) {
-    /* first_pixel() function is defined in feature.h and implemented in feature.c */
     first_pixel(configuration.filenames[0]);
   }
 
-if (strncmp(configuration.command, "max_pixel", 9) == 0) {
-    max_pixel(configuration.filenames[0]);
-}
+  if ( strncmp( configuration.command, "second_line", 11) == 0) {
+    second_line(configuration.filenames[0]);
+  }
 
-if (strncmp(configuration.command, "min_pixel", 9) == 0) {
+  if (strncmp(configuration.command, "max_pixel", 9) == 0) {
+    max_pixel(configuration.filenames[0]);
+  }
+
+  if (strncmp(configuration.command, "min_pixel", 9) == 0) {
   min_pixel(configuration.filenames[0]);
-}
+  }
+
+  else if (strcmp(configuration.command, "print_pixel") == 0) {
+    if (argc < 7) {
+        fprintf(stderr, "Usage: -c print_pixel <x> <y>\n");
+        return 1;
+    }
+ 
+    int x = atoi(argv[5]);
+    int y = atoi(argv[6]);
+ 
+    print_pixel(configuration.filenames[0], x, y);
+  }
 
 if (strncmp(configuration.command, "tenth_pixel", 9) == 0) {
   tenth_pixel(configuration.filenames[0]);
