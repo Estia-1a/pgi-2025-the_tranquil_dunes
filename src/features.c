@@ -148,7 +148,6 @@ void color_red(char *source_path) {
     unsigned char *data = NULL;
     int width, height, channel_count;
 
-    // Lire l'image
     if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
         fprintf(stderr, "Erreur lors de la lecture de l'image.\n");
         return;
@@ -156,7 +155,6 @@ void color_red(char *source_path) {
 
     int pixel_count = width * height;
 
-    // Pour chaque pixel, garder seulement le rouge
     for (int i = 0; i < pixel_count; i++) {
         int index = i * channel_count;
         // Garder R, mettre G et B à 0
@@ -168,6 +166,31 @@ void color_red(char *source_path) {
     // Écrire dans un nouveau fichier
     if (write_image_data("image_out.bmp", data, width, height) == 0) {
         fprintf(stderr, "Erreur lors de l'écriture de l'image.\n");
+    }
+
+}
+
+void color_green(char *source_path) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+
+    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image\n");
+        return;
+    }
+
+    int pixel_count = width * height;
+
+    for (int i = 0; i < pixel_count; i++) {
+        int index = i * channel_count;
+        data[index] = 0;       // R
+        data[index + 2] = 0;   // B
+        // On laisse G (index + 1)
+    }
+
+    // Sauvegarder dans une nouvelle image
+    if (write_image_data("image_out.bmp", data, width, height) == 0) {
+        fprintf(stderr, "Erreur lors de l'écriture de l'image\n");
     }
 
 }
