@@ -314,3 +314,44 @@ void color_invert(char *source_path) {
     }
 
 }
+
+void color_desaturate(char *source_path) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+
+    // Lire l'image
+    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image\n");
+        return;
+    }
+
+    int pixel_count = width * height;
+
+    // Désaturation de chaque pixel
+    for (int i = 0; i < pixel_count; i++) {
+        int index = i * channel_count;
+
+        unsigned char R = data[index];
+        unsigned char G = data[index + 1];
+        unsigned char B = data[index + 2];
+
+        unsigned char min_val = R;
+        if (G < min_val) min_val = G;
+        if (B < min_val) min_val = B;
+
+        unsigned char max_val = R;
+        if (G > max_val) max_val = G;
+        if (B > max_val) max_val = B;
+
+        unsigned char desaturated = (min_val + max_val) / 2;
+
+        data[index]     = desaturated;
+        data[index + 1] = desaturated;
+        data[index + 2] = desaturated;
+    }
+
+    if (write_image_data("image_out.bmp", data, width, height) == 0) {
+        fprintf(stderr, "Erreur lors de l'écriture de l'image\n");
+    }
+
+}
