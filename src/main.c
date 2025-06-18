@@ -79,6 +79,10 @@ if (strncmp(configuration.command, "color_invert", 9) == 0) {
 if (strncmp(configuration.command, "color_desaturate", 9) == 0) {
   color_desaturate(configuration.filenames[0]);
 }
+
+if (strcmp(configuration.command, "mirror_total") == 0) {
+    mirror_total(configuration.filenames[0]);
+}
   return 0;
 }
 

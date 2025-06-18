@@ -3,6 +3,7 @@
 
 #include "features.h"
 #include "utils.h"
+#include <stdlib.h>
 
 
 /**
@@ -355,3 +356,4 @@ void color_desaturate(char *source_path) {
     }
 
 }
+
