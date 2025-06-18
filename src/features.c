@@ -117,3 +117,29 @@ void min_pixel(char *source_path) {
         printf("min_pixel (%d, %d): %d, %d, %d\n", min_x, min_y, min_pixel->r, min_pixel->g, min_pixel->b);
     }
 }
+
+void tenth_pixel(char *source_path) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+
+    // Lecture de l'image
+    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image\n");
+        return;
+    }
+
+    if (width < 10) {
+        fprintf(stderr, "L'image doit avoir une largeur d'au moins 10 pixels\n");
+        return;
+    }
+
+    // Indice du dixième pixel (index 9 car on commence à 0)
+    int index = 9 * channel_count;
+
+    int R = data[index];
+    int G = data[index + 1];
+    int B = data[index + 2];
+
+    printf("tenth_pixel: %d, %d, %d\n", R, G, B);
+
+}
