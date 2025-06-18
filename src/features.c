@@ -789,3 +789,51 @@ void max_component(char *filename, char component) {
         printf("Aucune valeur maximale trouvée.\n");
  
 }
+
+
+void min_component(char *filename, char component) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+ 
+    if (read_image_data(filename, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image.\n");
+        return;
+    }
+ 
+    int min_value = 256;  // car max d'un channel est 255
+    int min_x = -1, min_y = -1;
+ 
+    int c_index = 0;
+    if (component == 'R') c_index = 0;
+    else if (component == 'G') c_index = 1;
+    else if (component == 'B') c_index = 2;
+    else {
+        fprintf(stderr, "Composante invalide : %c (utiliser R, G ou B)\n", component);
+        return;
+    }
+ 
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            int index = (y * width + x) * channel_count;
+ 
+            if (channel_count < 3) continue;
+ 
+            int value = data[index + c_index];
+            if (value < min_value) {
+                min_value = value;
+                min_x = x;
+                min_y = y;
+ 
+                // optimisation : si 0 trouvé, pas besoin de continuer
+                if (min_value == 0) break;
+            }
+        }
+        if (min_value == 0) break;
+    }
+ 
+    if (min_value < 256)
+        printf("min_component %c (%d, %d): %d\n", component, min_x, min_y, min_value);
+    else
+        printf("Aucune valeur minimale trouvée.\n");
+ 
+}
