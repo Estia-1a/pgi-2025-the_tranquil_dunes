@@ -550,3 +550,65 @@ void rotate_acw(char *source_path) {
     }
 
 }
+
+void scale_bilinear(char *source_path, float scale) {
+    unsigned char *data = NULL;
+    int width, height, channel_count;
+
+    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image.\n");
+        return;
+    }
+
+    int new_width = (int)(width * scale);
+    int new_height = (int)(height * scale);
+
+    unsigned char *scaled = malloc(new_width * new_height * channel_count);
+    if (scaled == NULL) {
+        fprintf(stderr, "Erreur d'allocation mémoire.\n");
+        free(data);
+        return;
+    }
+
+    for (int y = 0; y < new_height; y++) {
+        float gy = ((float)y) / scale;
+        int y0 = (int)gy;
+        int y1 = y0 + 1;
+        float dy = gy - y0;
+
+        if (y1 >= height) y1 = height - 1;
+
+        for (int x = 0; x < new_width; x++) {
+            float gx = ((float)x) / scale;
+            int x0 = (int)gx;
+            int x1 = x0 + 1;
+            float dx = gx - x0;
+
+            if (x1 >= width) x1 = width - 1;
+
+            for (int c = 0; c < channel_count; c++) {
+                // Pixels Q11, Q12, Q21, Q22
+                float Q11 = data[(y0 * width + x0) * channel_count + c];
+                float Q21 = data[(y0 * width + x1) * channel_count + c];
+                float Q12 = data[(y1 * width + x0) * channel_count + c];
+                float Q22 = data[(y1 * width + x1) * channel_count + c];
+
+                // Interpolation horizontale
+                float R1 = Q11 * (1 - dx) + Q21 * dx;
+                float R2 = Q12 * (1 - dx) + Q22 * dx;
+
+                // Interpolation verticale
+                float P = R1 * (1 - dy) + R2 * dy;
+
+                // Affecter au pixel final
+                scaled[(y * new_width + x) * channel_count + c] = (unsigned char)(P);
+            }
+        }
+    }
+
+    if (write_image_data("image_out.bmp", scaled, new_width, new_height) == 0) {
+        fprintf(stderr, "Erreur lors de l'écriture de l'image\n");
+    }
+
+
+}
