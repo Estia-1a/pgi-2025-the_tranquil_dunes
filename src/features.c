@@ -3,7 +3,7 @@
 
 #include "features.h"
 #include "utils.h"
-
+#include <stdlib.h>
 
 /**
  * @brief Here, you have to code features of the project.
@@ -53,21 +53,30 @@ void first_pixel(char *source_path) {
     
 }
 
-void second_line(char* sourcepath){
-    unsigned char* data;
+void second_line(char *source_path) {
+    unsigned char *data = NULL;
     int width, height, channel_count;
-
-    if (read_image_data(sourcepath, &data, &width, &height, &channel_count)){
-        if ( height >= 2 && channel_count > 3){
-            int index = (1 * width + 0) * channel_count;
-            printf("second_line : %d, %d, %d\n", data[index],data[index + 1],data[index + 2]);
-        } else {
-            printf("image trop petite");
-        }
-        free(data);
-    } else {
-        printf("Erreur Image");
+ 
+    
+    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
+        fprintf(stderr, "Erreur lors de la lecture de l'image\n");
+        return;
     }
+ 
+    if (height < 2) {
+        fprintf(stderr, "L'image doit avoir au moins 2 lignes.\n");
+        return;
+    }
+ 
+
+    int index = width * channel_count;  
+ 
+    int R = data[index];
+    int G = data[index + 1];
+    int B = data[index + 2];
+ 
+    printf("second_line: %d, %d, %d\n", R, G, B);
+ 
 }
 
 
