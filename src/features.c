@@ -51,4 +51,69 @@ void first_pixel(char *source_path) {
         printf("first_pixel: %d, %d, %d\n", r, g, b);
     }
     
-};
+}
+void max_pixel(char *source_path) {
+    unsigned char *data;
+    int width;
+    int height;
+    int channel_count;
+
+    read_image_data(source_path, &data, &width, &height, &channel_count);
+
+    int max_s = -1;
+    int max_x = 0, max_y = 0;
+
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            pixelRGB* pixel = get_pixel(data, width, height, channel_count, x, y);
+            if (pixel == NULL) {
+                continue;
+            }
+
+            int sum = pixel->r + pixel->g + pixel->b;
+            if (sum > max_s) {
+                max_s = sum;
+                max_x = x;
+                max_y = y;
+            }
+        }
+    }
+
+    pixelRGB* max_pixel = get_pixel(data, width, height, channel_count, max_x, max_y);
+    if (max_pixel != NULL) {
+        printf("max_pixel (%d, %d): %d, %d, %d\n", max_x, max_y, max_pixel->r, max_pixel->g, max_pixel->b);
+    }
+}
+
+void min_pixel(char *source_path) {
+    unsigned char *data;
+    int width;
+    int height;
+    int channel_count;
+
+    read_image_data(source_path, &data, &width, &height, &channel_count);
+
+    int min_s = 900;
+    int min_x = 0, min_y = 0;
+
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            pixelRGB* pixel = get_pixel(data, width, height, channel_count, x, y);
+            if (pixel == NULL) {
+                continue;
+            }
+
+            int sum = pixel->r + pixel->g + pixel->b;
+            if (sum < min_s) {
+                min_s = sum;
+                min_x = x;
+                min_y = y;
+            }
+        }
+    }
+
+    pixelRGB* min_pixel = get_pixel(data, width, height, channel_count, min_x, min_y);
+    if (min_pixel != NULL) {
+        printf("min_pixel (%d, %d): %d, %d, %d\n", min_x, min_y, min_pixel->r, min_pixel->g, min_pixel->b);
+    }
+}

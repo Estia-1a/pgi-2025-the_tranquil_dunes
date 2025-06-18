@@ -12,6 +12,7 @@
     },
     "files.associations": {
         "unistd.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "stddef.h": "c"
     },
 }
