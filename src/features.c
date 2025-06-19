@@ -54,6 +54,7 @@ void first_pixel(char *source_path) {
     
 }
 
+
 void second_line(char *source_path) {
     unsigned char *data = NULL;
     int width, height, channel_count;
@@ -147,30 +148,21 @@ void min_pixel(char *source_path) {
     }
 }
 
+
 void tenth_pixel(char *source_path) {
-    unsigned char *data = NULL;
+    unsigned char *data;
     int width, height, channel_count;
 
-    // Lecture de l'image
-    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
-        fprintf(stderr, "Erreur lors de la lecture de l'image\n");
-        return;
-    }
+    int pixel = 10;
+    pixel -= 1;
 
-    if (width < 10) {
-        fprintf(stderr, "L'image doit avoir une largeur d'au moins 10 pixels\n");
-        return;
-    }
+    read_image_data(source_path, &data, &width, &height, &channel_count);
+    
+    unsigned char r = data[(pixel) * channel_count];
+    unsigned char g = data[(pixel) * channel_count + 1];
+    unsigned char b = data[(pixel) * channel_count + 2];
 
-    // Indice du dixième pixel (index 9 car on commence à 0)
-    int index = 9 * channel_count;
-
-    int R = data[index];
-    int G = data[index + 1];
-    int B = data[index + 2];
-
-    printf("tenth_pixel: %d, %d, %d\n", R, G, B);
-
+    printf("tenth_pixel: %d, %d, %d\n", r, g, b);
 }
 
 void color_red(char *source_path) {
