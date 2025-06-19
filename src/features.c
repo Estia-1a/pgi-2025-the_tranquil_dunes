@@ -414,37 +414,31 @@ void mirror_total(char *source_path) {
 }
 
 void mirror_vertical(char *source_path) {
-    unsigned char *data = NULL;
+    unsigned char *data;
     int width, height, channel_count;
 
-    // Lecture de l'image
-    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
-        fprintf(stderr, "Erreur lors de la lecture de l'image\n");
-        return;
-    }
 
-    int image_size = width * height * channel_count;
-    unsigned char *mirrored = malloc(image_size);
-    if (mirrored == NULL) {
-        fprintf(stderr, "Erreur d'allocation mémoire\n");
-        free(data);
-        return;
-    }
+    read_image_data(source_path, &data, &width, &height, &channel_count);
 
-    // Pour chaque ligne
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
+    // Création tableau
+    unsigned char *output_data = (unsigned char *)malloc(width * height * channel_count * sizeof(unsigned char));
+
+    // Miroir vertical
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
             int src_index = (y * width + x) * channel_count;
-            int dst_index = (y * width + (width - 1 - x)) * channel_count;
+            int dst_index = ((height - 1 - y) * width + x) * channel_count;
 
-            for (int c = 0; c < channel_count; c++) {
-                mirrored[dst_index + c] = data[src_index + c];
-            }
+            output_data[dst_index + 0] = data[src_index + 0];  // R
+            output_data[dst_index + 1] = data[src_index + 1];  // G
+            output_data[dst_index + 2] = data[src_index + 2];  // B
         }
     }
 
-    if (write_image_data("image_out.bmp", mirrored, width, height) == 0) {
-        fprintf(stderr, "Erreur lors de l'écriture de l'image\n");
+    // Ecrire dans image_out.bmp
+    int write_success = write_image_data("image_out.bmp", output_data, width, height);
+    if (!write_success) {
+        fprintf(stderr, "Erreur lors de l'écriture.\n");
     }
 
 }
