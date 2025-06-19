@@ -617,50 +617,63 @@ void scale_bilinear(char *source_path, float scale) {
 
 }
 
-void scale_crop(char *source_path, int center_x, int center_y, int crop_width, int crop_height) {
-    unsigned char *data = NULL;
-    int width, height, channel_count;
+void scale_crop(char *source_path, int center_x, int center_y, int width, int height) {
+    unsigned char *data;
+    int original_width, original_height, channel_count;
 
-    // Lecture de l'image
-    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
-        fprintf(stderr, "Erreur lors de la lecture de l'image.\n");
+
+    if (!read_image_data(source_path, &data, &original_width, &original_height, &channel_count)) {
+        fprintf(stderr, "Erreur de lecture de l'image %s\n", source_path);
         return;
     }
 
-    // Calcul des coins du rectangle de découpe
-    int x0 = center_x - crop_width / 2;
-    int y0 = center_y - crop_height / 2;
+    // Calcule coordonnées début fin
+    int crop_x_start = center_x - width / 2;
+    int crop_x_end = crop_x_start + width;
+    int crop_y_start = center_y - height / 2;
+    int crop_y_end = crop_y_start + height;
 
-    // Sécuriser les bords
-    if (x0 < 0) x0 = 0;
-    if (y0 < 0) y0 = 0;
-    if (x0 + crop_width > width)  x0 = width - crop_width;
-    if (y0 + crop_height > height) y0 = height - crop_height;
-    if (x0 < 0) x0 = 0;
-    if (y0 < 0) y0 = 0;
+    // Ajuster les coordonnées pour rester dans les limites de l'image d'origine
+    if (crop_x_start < 0) {
+        crop_x_start = 0;
+        crop_x_end = width;
+    }
+    if (crop_x_end > original_width) {
+        crop_x_end = original_width;
+        crop_x_start = original_width - width;
+    }
+    if (crop_y_start < 0) {
+        crop_y_start = 0;
+        crop_y_end = height;
+    }
+    if (crop_y_end > original_height) {
+        crop_y_end = original_height;
+        crop_y_start = original_height - height;
+    }
 
-    unsigned char *cropped = malloc(crop_width * crop_height * channel_count);
-    if (cropped == NULL) {
-        fprintf(stderr, "Erreur d'allocation mémoire.\n");
+    int new_width = crop_x_end - crop_x_start;
+    int new_height = crop_y_end - crop_y_start;
+    unsigned char *cropped_data = (unsigned char *)malloc(new_width * new_height * channel_count);
+
+    if (cropped_data == NULL) {
+        fprintf(stderr, "Erreur mémoire.\n");
+        free(data);
         return;
     }
 
-    // Copie des pixels
-    for (int y = 0; y < crop_height; y++) {
-        for (int x = 0; x < crop_width; x++) {
-            int src_index = ((y0 + y) * width + (x0 + x)) * channel_count;
-            int dst_index = (y * crop_width + x) * channel_count;
-
-            for (int c = 0; c < channel_count; c++) {
-                cropped[dst_index + c] = data[src_index + c];
+    for (int y = crop_y_start; y < crop_y_end; ++y) {
+        for (int x = crop_x_start; x < crop_x_end; ++x) {
+            for (int c = 0; c < channel_count; ++c) {
+                cropped_data[((y - crop_y_start) * new_width + (x - crop_x_start)) * channel_count + c] = data[(y * original_width + x) * channel_count + c];
             }
         }
     }
 
-    if (write_image_data("image_out.bmp", cropped, crop_width, crop_height) == 0) {
-        fprintf(stderr, "Erreur lors de l'écriture de l'image cropée.\n");
+    // Ecrire dans image_out.bmp
+    int write_success = write_image_data("image_out.bmp", cropped_data, new_width, new_height);
+    if (!write_success) {
+        fprintf(stderr, "Erreur lors de l'écriture.\n");
     }
-
 }
 
 void scale_nearest(char *source_path, float scale) {
