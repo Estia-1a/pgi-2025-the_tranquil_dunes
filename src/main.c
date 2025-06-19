@@ -47,7 +47,9 @@ if (strncmp(configuration.command, "max_pixel", 9) == 0) {
 if (strncmp(configuration.command, "min_pixel", 9) == 0) {
   min_pixel(configuration.filenames[0]);
 }
-
+ if (strncmp(configuration.command, "min_component", 13) == 0) {
+    max_component(configuration.filenames[0], (configuration.arguments[0][0]));
+  } 
   return 0;
 }
 
