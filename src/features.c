@@ -242,36 +242,34 @@ void color_blue(char *source_path) {
 
 }
 
-void color_gray(char *source_path) {
-    unsigned char *data = NULL;
+void color_gray(char *input_filename) {
+    unsigned char *data;
     int width, height, channel_count;
 
-    if (read_image_data(source_path, &data, &width, &height, &channel_count) == 0) {
-        fprintf(stderr, "Erreur lors de la lecture de l'image\n");
-        return;
+
+    read_image_data(input_filename, &data, &width, &height, &channel_count);
+
+    // Création tableau
+    unsigned char *output_data = (unsigned char *)malloc(width * height * channel_count * sizeof(unsigned char));
+
+    // Convertion de R, G et B
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            unsigned char r = data[(y * width + x) * channel_count + 0];
+            unsigned char g = data[(y * width + x) * channel_count + 1];
+            unsigned char b = data[(y * width + x) * channel_count + 2];
+            unsigned char gray = (unsigned char)((r + g + b) / 3);
+
+            output_data[(y * width + x) * channel_count + 0] = gray;  // R
+            output_data[(y * width + x) * channel_count + 1] = gray;  // G
+            output_data[(y * width + x) * channel_count + 2] = gray;  // B
+        }
     }
 
-    int pixel_count = width * height;
-
-    // Pour chaque pixel, on calcule la moyenne R, G, B
-    for (int i = 0; i < pixel_count; i++) {
-        int index = i * channel_count;
-
-        unsigned char R = data[index];
-        unsigned char G = data[index + 1];
-        unsigned char B = data[index + 2];
-
-        unsigned char gray = (R + G + B) / 3;
-
-        data[index]     = gray;
-        data[index + 1] = gray;
-        data[index + 2] = gray;
-        // Si canal alpha présent, on ne le touche pas
-    }
-
-    // Écriture du fichier de sortie
-    if (write_image_data("image_out.bmp", data, width, height) == 0) {
-        fprintf(stderr, "Erreur lors de l'écriture de l'image\n");
+    // Ecrire dans image_out.bmp
+    int write_success = write_image_data("image_out.bmp", output_data, width, height);
+    if (!write_success) {
+        fprintf(stderr, "Erreur lors de l'écriture.\n");
     }
 
 }
